@@ -7,6 +7,10 @@ Created by:
 Thanks to:
   Christian Hergert <chris@dronelabs.com>
 
+Installation directions:
+  $ cp gotofile.gedit-plugin ~/.gnome2/gedit/plugins/
+  $ cp -r gotofile ~/.gnome2/gedit/plugins/
+
 Use Control+Alt+o to bring up the dialog, or select File -> Go to File.
 If you have the Filebrowser plugin installed, this plugin will use it's root
 directory. Otherwise, it will use the directory gedit was started from.
