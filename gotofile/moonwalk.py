@@ -1,0 +1,60 @@
+# Copyright (C) 2008  Christian Hergert <chris@dronelabs.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
+ 
+def moonWalk(path, **kwargs):
+    """
+Generator for recursively walking a directory tree with additional
+options compared to os.walk.
+ 
+@path: a str containing the root directoyr or file
+@kwargs: The following args are supported:
+ignoredot=False -- ignores dot folders during recursion
+maxdepth=-1 -- sets the maximum recursions to be performed
+ 
+Returns: yields tuple of (str,[str],[str]) containing the root dir
+as the first item, list of files as the second, and list of
+dirs as the third.
+"""
+    if not os.path.isdir(path):
+        raise StopIteration
+ 
+    ignoredot = kwargs.get('ignoredot', False)
+    maxdepth = kwargs.get('maxdepth', -1)
+    curdepth = kwargs.get('curdepth', -1)
+    kwargs['curdepth'] = curdepth + 1
+ 
+    if maxdepth > -1 and curdepth > maxdepth:
+        raise StopIteration
+ 
+    matches = lambda p: not ignoredot or not p.startswith('.')
+    dirs = []
+    files = []
+ 
+    for child in os.listdir(path):
+        if matches(child):
+            fullpath = os.path.join(path, child)
+            if os.path.isdir(fullpath):
+                dirs.append(child)
+            else:
+                files.append(child)
+ 
+    yield (path, dirs, files)
+ 
+    for child in dirs:
+        fullpath = os.path.join(path, child)
+        for item in moonWalk(fullpath, **kwargs):
+            yield item
