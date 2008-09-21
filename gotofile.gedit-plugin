@@ -1,0 +1,8 @@
+[Gedit Plugin]
+Loader=python
+Module=gotofile
+IAge=2
+Name=Go to File
+Description=Easily open and move between files.
+Authors=Eric Butler <eric@extremeboredom.net>
+Copyright=foo
