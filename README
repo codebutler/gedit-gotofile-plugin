@@ -1,0 +1,17 @@
+Gedit "Go to File" plugin - Easily open and switch between files.
+Copyright (C) 2008 Eric Butler
+
+Created by:
+  Eric Butler <eric@extremeboredom.net>
+
+Thanks to:
+  Christian Hergert <chris@dronelabs.com>
+
+Use Control+Alt+o to bring up the dialog, or select File -> Go to File.
+If you have the Filebrowser plugin installed, this plugin will use it's root
+directory. Otherwise, it will use the directory gedit was started from.
+
+Inspired by TextMate and the Gedit Snap Open Plugin by Mads Buus Jensen.
+Note that this plugin cannot be used along side Snap Open.
+
+Licensed under the GNU GPL v3 or later.

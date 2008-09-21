@@ -1,4 +1,4 @@
-# Gedit Go to File plugin.
+# Gedit Go to File plugin - Easily open and switch between files
 # Copyright (C) 2008  Eric Butler <eric@extremeboredom.net>
 #
 # Based on "Snap Open" (C) 2006 Mads Buus Jensen <online@buus.net>
