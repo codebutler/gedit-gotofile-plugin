@@ -14,21 +14,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
- 
+
 class MoonWalker(object):
-    def __init__(self, onResult, onClear=None, onFinish=None):
+	def __init__(self, onResult, onClear=None, onFinish=None):
 		self._onResult  = onResult
 		self._onClear   = onClear
 		self._onFinish  = onFinish
 		self._userData  = None
 
-    def walk(self, query, ignoredot = False, maxdepth = -1, user_data = None):
-    	self._onClear(self, user_data)
-    	for root, dirs, files in self._innerWalk(query, ignoredot=ignoredot, maxdepth=maxdepth, user_data=user_data):
-    		self._onResult(self, root, dirs, files, user_data)
-    	self._onFinish(self, user_data)
+	def walk(self, query, ignoredot = False, maxdepth = -1, user_data = None):
+		self._onClear(self, user_data)
+		for root, dirs, files in self._innerWalk(query, ignoredot=ignoredot, maxdepth=maxdepth, user_data=user_data):
+			self._onResult(self, root, dirs, files, user_data)
+		self._onFinish(self, user_data)
 
-    def _innerWalk(self, path, **kwargs):
+		def cancel(self):
+			pass
+			
+	def _innerWalk(self, path, **kwargs):
 		"""
 	Generator for recursively walking a directory tree with additional
 	options compared to os.walk.
@@ -58,16 +61,16 @@ class MoonWalker(object):
 		files = []
 	 
 		for child in os.listdir(path):
-		    if matches(child):
-		        fullpath = os.path.join(path, child)
-		        if os.path.isdir(fullpath):
-		            dirs.append(child)
-		        else:
-		            files.append(child)
+			if matches(child):
+				fullpath = os.path.join(path, child)
+				if os.path.isdir(fullpath):
+					dirs.append(child)
+				else:
+					files.append(child)
 	 
 		yield (path, dirs, files)
 	 
 		for child in dirs:
-		    fullpath = os.path.join(path, child)
-		    for item in self._innerWalk(fullpath, **kwargs):
-		        yield item
+			fullpath = os.path.join(path, child)
+			for item in self._innerWalk(fullpath, **kwargs):
+				yield item
