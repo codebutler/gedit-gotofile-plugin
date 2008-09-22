@@ -22,7 +22,6 @@ import gtk, gobject, pango
 import sexy
 import relevance
 import os
-import texas
 
 class GotoFileWindow(gtk.Window):
 	def __init__(self, plugin):
@@ -110,7 +109,13 @@ class GotoFileWindow(gtk.Window):
 
 		self.add(vbox)
 		
-		self._walker = texas.WalkerTexasRanger(self._onWalkResult, self._onWalkClear, self._onWalkFinish)
+		try:
+			import texas
+			self._walker = texas.WalkerTexasRanger(self._onWalkResult, self._onWalkClear, self._onWalkFinish)
+		except:
+			print "async walker not available"
+			import moonwalk
+			self._walker = moonwalk.MoonWalker(self._onWalkResult, self._onWalkClear, self._onWalkFinish)
 
 	def _windowShow(self, win):
 		self._rootDirectory = self._plugin.getRootDirectory()

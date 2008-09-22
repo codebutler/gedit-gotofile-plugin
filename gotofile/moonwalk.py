@@ -15,46 +15,59 @@
 
 import os
  
-def moonWalk(path, **kwargs):
-    """
-Generator for recursively walking a directory tree with additional
-options compared to os.walk.
- 
-@path: a str containing the root directoyr or file
-@kwargs: The following args are supported:
-ignoredot=False -- ignores dot folders during recursion
-maxdepth=-1 -- sets the maximum recursions to be performed
- 
-Returns: yields tuple of (str,[str],[str]) containing the root dir
-as the first item, list of files as the second, and list of
-dirs as the third.
-"""
-    if not os.path.isdir(path):
-        raise StopIteration
- 
-    ignoredot = kwargs.get('ignoredot', False)
-    maxdepth = kwargs.get('maxdepth', -1)
-    curdepth = kwargs.get('curdepth', -1)
-    kwargs['curdepth'] = curdepth + 1
- 
-    if maxdepth > -1 and curdepth > maxdepth:
-        raise StopIteration
- 
-    matches = lambda p: not ignoredot or not p.startswith('.')
-    dirs = []
-    files = []
- 
-    for child in os.listdir(path):
-        if matches(child):
-            fullpath = os.path.join(path, child)
-            if os.path.isdir(fullpath):
-                dirs.append(child)
-            else:
-                files.append(child)
- 
-    yield (path, dirs, files)
- 
-    for child in dirs:
-        fullpath = os.path.join(path, child)
-        for item in moonWalk(fullpath, **kwargs):
-            yield item
+class MoonWalker(object):
+    def __init__(self, onResult, onClear=None, onFinish=None):
+		self._onResult  = onResult
+		self._onClear   = onClear
+		self._onFinish  = onFinish
+		self._userData  = None
+
+    def walk(self, query, ignoredot = False, maxdepth = -1, user_data = None):
+    	self._onClear(self, user_data)
+    	for root, dirs, files in self._innerWalk(query, ignoredot=ignoredot, maxdepth=maxdepth, user_data=user_data):
+    		self._onResult(self, root, dirs, files, user_data)
+    	self._onFinish(self, user_data)
+
+    def _innerWalk(self, path, **kwargs):
+		"""
+	Generator for recursively walking a directory tree with additional
+	options compared to os.walk.
+	 
+	@path: a str containing the root directoyr or file
+	@kwargs: The following args are supported:
+	ignoredot=False -- ignores dot folders during recursion
+	maxdepth=-1 -- sets the maximum recursions to be performed
+	 
+	Returns: yields tuple of (str,[str],[str]) containing the root dir
+	as the first item, list of files as the second, and list of
+	dirs as the third.
+	"""
+		if not os.path.isdir(path):
+		    raise StopIteration
+	 
+		ignoredot = kwargs.get('ignoredot', False)
+		maxdepth = kwargs.get('maxdepth', -1)
+		curdepth = kwargs.get('curdepth', -1)
+		kwargs['curdepth'] = curdepth + 1
+	 
+		if maxdepth > -1 and curdepth > maxdepth:
+		    raise StopIteration
+	 
+		matches = lambda p: not ignoredot or not p.startswith('.')
+		dirs = []
+		files = []
+	 
+		for child in os.listdir(path):
+		    if matches(child):
+		        fullpath = os.path.join(path, child)
+		        if os.path.isdir(fullpath):
+		            dirs.append(child)
+		        else:
+		            files.append(child)
+	 
+		yield (path, dirs, files)
+	 
+		for child in dirs:
+		    fullpath = os.path.join(path, child)
+		    for item in self._innerWalk(fullpath, **kwargs):
+		        yield item
