@@ -23,13 +23,15 @@ class MoonWalker(object):
 		self._userData  = None
 
 	def walk(self, query, ignoredot = False, maxdepth = -1, user_data = None):
+		self._cancel = False
 		self._onClear(self, user_data)
 		for root, dirs, files in self._innerWalk(query, ignoredot=ignoredot, maxdepth=maxdepth, user_data=user_data):
 			self._onResult(self, root, dirs, files, user_data)
+			if self._cancel: return
 		self._onFinish(self, user_data)
 
-		def cancel(self):
-			pass
+	def cancel(self):
+		self._cancel = True
 			
 	def _innerWalk(self, path, **kwargs):
 		"""
