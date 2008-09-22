@@ -19,12 +19,11 @@
 
 import gedit
 import pygtk
-import gconf
+import gtk, gconf
 import os
 import relevance
 from urlparse import urlparse, urljoin
 from fnmatch import fnmatch
-import texas
 from gotofile_window import GotoFileWindow
 
 UI_STRING = """<ui>
@@ -65,7 +64,7 @@ class GotoFilePluigin(gedit.Plugin):
 		self._geditWindow = None
 	
 	def getMaxDepth(self):
-		return self._readSetting('max_depth', gconf.VALUE_INT, 5)
+		return self._readSetting('max_depth', gconf.VALUE_INT, 10)
 	
 	def setMaxDepth(self, depth):
 		self._writeSetting('max_depth', gconf.VALUE_INT, depth)

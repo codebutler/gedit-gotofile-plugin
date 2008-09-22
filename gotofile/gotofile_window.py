@@ -20,6 +20,9 @@
 import pygtk
 import gtk, gobject, pango
 import sexy
+import relevance
+import os
+import texas
 
 class GotoFileWindow(gtk.Window):
 	def __init__(self, plugin):
@@ -117,6 +120,7 @@ class GotoFileWindow(gtk.Window):
 		self._search('')
 
 	def _windowDeleteEvent(self, win, event):
+		self._walker.cancel()
 		self.hide()
 		return True
 	
@@ -160,23 +164,21 @@ class GotoFileWindow(gtk.Window):
 		if iter:
 			self._expander.get_label_widget().set_markup(model.get_value(iter, 1))
 	
-	def _onWalkResult(self, walker, dirname, dirs, files):
-		print "walk result"
+	def _onWalkResult(self, walker, dirname, dirs, files, text):
+		if text == None: text = ''
 		for file, score in self._plugin.filterFiles(text, files):
 			name = relevance.formatCommonSubstrings(file, text)
-			self._store.append((name, os.path.join(root, name), os.path.join(root, file), score))
-			total = self._store.iter_n_children()
+			self._store.append((name, os.path.join(dirname, name), os.path.join(dirname, file), score))
+			total = self._store.iter_n_children(None)
 			if total == self._plugin.getMaxResults():
-				print "Max results reached"
+				print "Max results reached",self._plugin.getMaxResults()
 				walker.cancel()
 				break
 	
-	def _onWalkClear(self, walker):
-		print "walk clear"
+	def _onWalkClear(self, walker, text):
 		self._store.clear()
 	
-	def _onWalkFinish(self, walker):
-		print "Walk complete"
+	def _onWalkFinish(self, walker, text):
 		iter = self._sortModel.get_iter_first()
 		if iter:
 			self._tree.get_selection().select_iter(iter)
@@ -185,11 +187,9 @@ class GotoFileWindow(gtk.Window):
 	
 	def _search(self, text):
 		text = text.replace(' ', '')
-		self._store.clear()
-
 		ignoreDot = not self._plugin.getShowHidden()
 		maxDepth  = self._plugin.getMaxDepth()
-		self._walker.walk(self._rootDirectory, ignoredot = ignoreDot, maxdepth = maxDepth)
+		self._walker.walk(self._rootDirectory, ignoredot = ignoreDot, maxdepth = maxDepth, user_data=text)
 	
 	def _openSelectedFile(self):
 		model, iter = self._tree.get_selection().get_selected()

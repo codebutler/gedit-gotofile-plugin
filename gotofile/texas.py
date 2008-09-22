@@ -31,18 +31,22 @@ class WalkerTexasRanger(object):
         self._onClear   = onClear
         self._onFinish  = onFinish
         self._enumerate = gio.Cancellable()
+        self._userData  = None
     
     def _result(self, *args, **kwargs):
         if callable(self._onResult):
-            apply(self._onResult, [self] + list(args), kwargs)
+            userData = self._userData and [self._userData] or [None]
+            apply(self._onResult, [self] + list(args) + userData, kwargs)
     
     def _clear(self, *args, **kwargs):
         if callable(self._onClear):
-            apply(self._onClear, [self] + list(args), kwargs)
+            userData = self._userData and [self._userData] or [None]
+            apply(self._onClear, [self] + list(args) + userData, kwargs)
     
     def _finish(self, *args, **kwargs):
         if callable(self._onFinish):
-            apply(self._onFinish, [self] + list(args), kwargs)
+            userData = self._userData and [self._userData] or [None]
+            apply(self._onFinish, [self] + list(args) + userData, kwargs)
     
     def cancel(self):
         """
@@ -51,10 +55,11 @@ class WalkerTexasRanger(object):
         self._stamp = None
         self._enumerate.cancel()
         
-    def walk(self, query, ignoredot = False, maxdepth = -1):
+    def walk(self, query, ignoredot = False, maxdepth = -1, user_data = None):
         # cancel any existing request
         self._enumerate.cancel()
         self._enumerate.reset()
+        self._userData = user_data
         
         # call the clear callback
         self._clear()
@@ -124,6 +129,7 @@ class WalkerTexasRanger(object):
             
             self._result(dirname, dirs, files)
             children.close()
+
             del children
         except gio.Error, ex:
             pass
@@ -148,7 +154,8 @@ if __name__ == '__main__':
     import gtk
     import pprint
     
-    def p(walker, dirname, dirs, files):
+    def p(walker, dirname, dirs, files, user):
+        assert(user != None)
         print '=' * 76
         print dirname
         if dirs:
@@ -164,7 +171,7 @@ if __name__ == '__main__':
     #walker.walk('/home/chergert')
     
     def newwalk():
-        walker.walk('/home/chergert', True, 2)
+        walker.walk('/home/chergert', True, 2, "user data")
         return False
     
     # start a new search 50 mili later
