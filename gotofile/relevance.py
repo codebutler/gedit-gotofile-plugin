@@ -96,22 +96,30 @@ def score(s, query):
     """
     if len(query) == 0:
         return 1
+
+    ls = s.lower()
+    lquery = query.lower()
+
+    lastPos = 0
+    for c in lquery:
+        lastPos = ls.find(c, lastPos)
+        if lastPos == -1:
+            return 0    
     
     score = float(0)
-    ls = s.lower()
     
     # Find the shortest possible substring that matches the query
     # and get the ration of their lengths for a base score
-    match = _findBestMatch(ls, query)
+    match = _findBestMatch(ls, lquery)
     if match[1] - match[0] == 0:
         return .0
     
-    score = len(query) / float(match[1] - match[0])
+    score = len(lquery) / float(match[1] - match[0])
     if score == 0:
         return .0
         
     # Now we weight by string length so shorter strings are better
-    score *= .7 + len(query) / len(s) * .3
+    score *= .7 + len(lquery) / len(s) * .3
     
     # Bonus points if the characters start words
     good = 0
@@ -119,13 +127,13 @@ def score(s, query):
     firstCount = 0
     for i in range(match[0], match[1] - 1):
         if s[i] == ' ':
-            if ls[i + 1] in query:
+            if ls[i + 1] in lquery:
                 firstCount += 1
             else:
                 bad += 1
     
     # A first character match counts extra
-    if query[0] == ls[0]:
+    if lquery[0] == ls[0]:
         firstCount += 2
         
     # The longer the acronym, the better it scores
@@ -136,11 +144,11 @@ def score(s, query):
         good += 2
         
     # Super bonus if the whole match is at the beginning
-    if match[1] == len(query) - 1:
+    if match[1] == len(lquery) - 1:
         good += match[1] + 4
         
     # Super duper bonus if it is a perfect match
-    if query == ls:
+    if lquery == ls:
         good += match[1] * 2 + 4
         
     if good + bad > 0:
@@ -150,7 +158,7 @@ def score(s, query):
     # than split matches.  Perfect matches get the .9 - 1.0 range
     # everything else lower
     
-    if match[1] - match[0] == len(query):
+    if match[1] - match[0] == len(lquery):
         score = .9 + .1 * score
     else:
         score = .9 * score
