@@ -27,7 +27,7 @@ class MoonWalker(object):
 		self._onClear(self, user_data)
 		for root, dirs, files in self._innerWalk(query, ignoredot=ignoredot, maxdepth=maxdepth, user_data=user_data):
 			self._onResult(self, root, dirs, files, user_data)
-			if self._cancel: return
+			if self._cancel: break
 		self._onFinish(self, user_data)
 
 	def cancel(self):

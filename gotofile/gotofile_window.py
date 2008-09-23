@@ -136,23 +136,24 @@ class GotoFileWindow(gtk.Window):
 		 self._search(entry.get_text())
 
 	def _entryKeyPress(self, entry, event):
-		model, iter = self._tree.get_selection().get_selected()
-		if iter:
-			path = model.get_path(iter)
-			if event.keyval == gtk.keysyms.Up:
-				path = (path[0] - 1,)
-				if path[0] >= 0:
-					iter = model.get_iter(path)
-					self._tree.get_selection().select_iter(iter)
-				return True
-			elif event.keyval == gtk.keysyms.Down:
-				path = (path[0] + 1,)
-				if path[0] < model.iter_n_children(None):
-					iter = model.get_iter(path)
-					self._tree.get_selection().select_iter(iter)
-				return True
-			elif event.keyval == gtk.keysyms.Escape:
-				self.hide()
+                if event.keyval == gtk.keysyms.Escape:
+			self.hide()
+                else:
+			model, iter = self._tree.get_selection().get_selected()
+			if iter:
+				path = model.get_path(iter)
+				if event.keyval == gtk.keysyms.Up:
+					path = (path[0] - 1,)
+					if path[0] >= 0:
+						iter = model.get_iter(path)
+						self._tree.get_selection().select_iter(iter)
+					return True
+				elif event.keyval == gtk.keysyms.Down:
+					path = (path[0] + 1,)
+					if path[0] < model.iter_n_children(None):
+						iter = model.get_iter(path)
+						self._tree.get_selection().select_iter(iter)
+					return True
 		return False
 	
 	def _filtersChanged(self, sender):

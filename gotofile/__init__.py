@@ -70,7 +70,7 @@ class GotoFilePluigin(gedit.Plugin):
 		self._writeSetting('max_depth', gconf.VALUE_INT, depth)
 
 	def getMaxResults(self):
-		return self._readSetting('max_results', gconf.VALUE_INT, 30)
+		return self._readSetting('max_results', gconf.VALUE_INT, 100)
 
 	def setMaxResults(self, results):
 		self._writeSetting('max_results', gconf.VALUE_INT, results)
